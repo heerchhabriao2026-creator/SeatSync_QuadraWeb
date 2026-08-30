@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <header>
+        <h1>📚 SeatSync</h1>
+        <p>Smart Library Seat Management</p>
+    </header>
+
+    <nav class="tabs">
+        <button id="studentTabBtn" class="tab-btn active">🎓 Student</button>
+        <button id="staffTabBtn" class="tab-btn">🧑‍💼 Staff</button>
+    </nav>
+
+    <main>
+
+        <!-- ============= STUDENT VIEW ============= -->
+        <section id="studentView">
+
+            <section class="dashboard">
+                <div class="card">
+                    <h2 id="availableCount">0</h2>
+                    <p>Available Seats</p>
+                </div>
+                <div class="card">
+                    <h2 id="occupiedCount">0</h2>
+                    <p>Occupied Seats</p>
+                </div>
+                <div class="card">
+                    <h2 id="totalCount">0</h2>
+                    <p>Total Seats</p>
+                </div>
+            </section>
+
+            <section class="seats-section">
+                <h2>Library Seats</h2>
+                <div id="seatContainer" class="seat-container">
+                    Loading seats...
+                </div>
+            </section>
+
+        </section>
+
+        <!-- ============= STAFF VIEW ============= -->
+        <section id="staffView" class="hidden">
+
+            <section class="dashboard">
+                <div class="card">
+                    <h2 id="staffAvailableCount">0</h2>
+                    <p>Available Seats</p>
+                </div>
+                <div class="card">
+                    <h2 id="staffOverdueCount">0</h2>
+                    <p>Overdue Students</p>
+                </div>
+                <div class="card">
+                    <h2 id="staffTotalCount">0</h2>
+                    <p>Total Seats</p>
+                </div>
+            </section>
+
+            <section class="seats-section">
+                <h2>Students Who Stepped Out</h2>
+                <table class="staff-table" id="departuresTable">
+                    <thead>
+                        <tr>
+                            <th>Seat</th>
+                            <th>Reg Number</th>
+                            <th>Return Time</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="departuresBody">
+                        <!-- rows injected by JS -->
+                    </tbody>
+                </table>
+                <p id="noDepartures" class="hidden">No students are currently away.</p>
+            </section>
+
+        </section>
+
+    </main>
+
+    <!-- ============= DEPARTURE MODAL ============= -->
+    <div id="departureModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3 id="modalSeatTitle">Leaving Seat A01?</h3>
+            <label>Registration Number</label>
+            <input type="text" id="regNumberInput" placeholder="e.g. 21CS045">
+
+            <label>Expected Return Time</label>
+            <input type="time" id="returnTimeInput">
+
+            <div class="modal-actions">
+                <button id="cancelDepartureBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDepartureBtn" class="btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
