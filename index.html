@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <header>
+        <h1>📚 SeatSync</h1>
+        <p>Smart Library Seat Management</p>
+    </header>
+
+    <!-- ============= AUTH SCREEN ============= -->
+    <section id="authScreen">
+        <div class="auth-box">
+            <div class="auth-toggle">
+                <button id="showLoginBtn" class="tab-btn active">Login</button>
+                <button id="showSignupBtn" class="tab-btn">Create Account</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="loginForm">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="you@college.edu">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
+                <button id="loginBtn" class="btn-primary full-width">Login</button>
+                <p id="loginError" class="auth-error hidden"></p>
+            </div>
+
+            <!-- SIGNUP FORM -->
+            <div id="signupForm" class="hidden">
+                <label>I am a</label>
+                <select id="signupRole">
+                    <option value="student">Student</option>
+                    <option value="staff">Staff</option>
+                </select>
+                <label>Email</label>
+                <input type="email" id="signupEmail" placeholder="you@college.edu">
+                <label>Password</label>
+                <input type="password" id="signupPassword" placeholder="At least 6 characters">
+                <button id="signupBtn" class="btn-primary full-width">Create Account</button>
+                <p id="signupError" class="auth-error hidden"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============= APP (hidden until logged in) ============= -->
+    <div id="appContainer" class="hidden">
+
+      <nav class="tabs">
+
+    <span id="welcomeText" class="welcome-text"></span>
+
+    <div class="view-tabs">
+        <button id="studentTabBtn" class="tab-btn active">
+            🧑‍🎓 Student
+        </button>
+
+        <button id="staffTabBtn" class="tab-btn">
+            👩‍🏫 Staff
+        </button>
+    </div>
+
+    <button id="logoutBtn" class="tab-btn">
+        Logout
+    </button>
+
+</nav>
+        <main>
+
+            <!-- STUDENT VIEW -->
+            <section id="studentView" class="hidden">
+                <section class="dashboard">
+                    <div class="card"><h2 id="availableCount">0</h2><p>Available Seats</p></div>
+                    <div class="card"><h2 id="occupiedCount">0</h2><p>Occupied Seats</p></div>
+                    <div class="card"><h2 id="totalCount">0</h2><p>Total Seats</p></div>
+                </section>
+                <section class="seats-section">
+                    <h2>Library Seats</h2>
+                    <div id="seatContainer" class="seat-container">Loading seats...</div>
+                </section>
+            </section>
+
+            <!-- STAFF VIEW -->
+            <section id="staffView" class="hidden">
+                <section class="dashboard">
+                    <div class="card"><h2 id="staffAvailableCount">0</h2><p>Available Seats</p></div>
+                    <div class="card"><h2 id="staffOverdueCount">0</h2><p>Overdue Students</p></div>
+                    <div class="card"><h2 id="staffTotalCount">0</h2><p>Total Seats</p></div>
+                </section>
+                <section class="seats-section">
+                    <h2>Students Who Stepped Out</h2>
+                    <table class="staff-table" id="departuresTable">
+                        <thead>
+                            <tr><th>Seat</th><th>Reg Number</th><th>Return Time</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody id="departuresBody"></tbody>
+                    </table>
+                    <p id="noDepartures" class="hidden">No students are currently away.</p>
+                </section>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- ============= SIT DOWN MODAL ============= -->
+    <div id="sitDownModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3 id="sitDownTitle">Sit at Seat A01?</h3>
+            <label>Registration Number</label>
+            <input type="text" id="sitDownRegInput" placeholder="e.g. 21CS045">
+            <div class="modal-actions">
+                <button id="cancelSitDownBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmSitDownBtn" class="btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============= LEAVE CHOICE MODAL ============= -->
+    <div id="leaveChoiceModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3 id="leaveChoiceTitle">Leaving Seat A01?</h3>
+            <p class="modal-subtext">What would you like to do?</p>
+            <div class="modal-actions modal-actions-stacked">
+                <button id="takingBreakBtn" class="btn-primary">🚶 Taking a Break</button>
+                <button id="doneTodayBtn" class="btn-primary">✅ Done for Today</button>
+                <button id="cancelLeaveChoiceBtn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============= BREAK RETURN TIME MODAL ============= -->
+    <div id="departureModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h3>Expected Return Time</h3>
+            <label>When will you be back?</label>
+            <input type="time" id="returnTimeInput">
+            <div class="modal-actions">
+                <button id="cancelDepartureBtn" class="btn-secondary">Back</button>
+                <button id="confirmDepartureBtn" class="btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
