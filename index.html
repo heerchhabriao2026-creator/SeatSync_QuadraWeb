@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync - Smart Library Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>📚 SeatSync</h1>
+        <p>Smart Library Seat & Analytics Platform</p>
+    </header>
+
+    <!-- AUTHENTICATION SCREEN -->
+    <section id="authScreen">
+        <div class="auth-box">
+            <div class="auth-toggle">
+                <button id="showLoginBtn" class="tab-btn active" type="button">Login</button>
+                <button id="showSignupBtn" class="tab-btn" type="button">Create Account</button>
+            </div>
+
+            <form id="loginForm">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="you@college.edu" required autocomplete="email">
+                
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                
+                <button type="submit" id="loginBtn" class="btn-primary">Login</button>
+                <p id="loginError" class="auth-error hidden"></p>
+            </form>
+
+            <form id="signupForm" class="hidden">
+                <label for="signupRole">I am a</label>
+                <select id="signupRole" required>
+                    <option value="student">Student</option>
+                    <option value="staff">Staff / Admin</option>
+                </select>
+                
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="you@college.edu" required autocomplete="email">
+                
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="At least 6 characters" minlength="6" required autocomplete="new-password">
+                
+                <button type="submit" id="signupBtn" class="btn-primary">Create Account</button>
+                <p id="signupError" class="auth-error hidden"></p>
+            </form>
+        </div>
+    </section>
+
+    <!-- APP CONTAINER -->
+    <div id="appContainer" class="hidden">
+
+        <nav class="tabs">
+            <span id="welcomeText" class="welcome-text"></span>
+
+            <div class="view-tabs">
+                <button id="studentTabBtn" class="tab-btn active" type="button">🧑‍🎓 Student</button>
+                <button id="analyticsTabBtn" class="tab-btn" type="button">📊 Analytics</button>
+                <button id="staffTabBtn" class="tab-btn" type="button">👩‍🏫 Staff</button>
+            </div>
+
+            <button id="logoutBtn" class="tab-btn" type="button" style="background: rgba(255, 100, 100, 0.8); color: white;">Logout</button>
+        </nav>
+
+        <main>
+            <!-- STUDENT VIEW -->
+            <section id="studentView">
+                <!-- DASHBOARD METRICS CARDS -->
+                <section class="dashboard">
+                    <div class="card"><h2 id="availableCount">0</h2><p>Available Seats</p></div>
+                    <div class="card"><h2 id="occupiedCount">0</h2><p>Occupied Seats</p></div>
+                    <div class="card"><h2 id="totalCount">0</h2><p>Total Seats</p></div>
+                </section>
+
+                <!-- HABIT METRICS -->
+                <section class="dashboard" style="margin-top: -10px;">
+                    <div class="card" style="width: 325px;">
+                        <h2 id="userWeeklyHours">0.0 hrs</h2>
+                        <p>Hours Studied (This Week)</p>
+                    </div>
+                    <div class="card" style="width: 325px;">
+                        <h2 id="userBreakCompliance">100%</h2>
+                        <p>Break Compliance Rate</p>
+                    </div>
+                </section>
+
+                <!-- CONTROLS -->
+                <section class="seats-section" style="padding: 15px 30px; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <input type="text" id="seatSearchInput" placeholder="🔍 Search seat or reg number..." style="flex: 2; min-width: 200px; padding: 12px; border-radius: 10px; border: 1px solid #ccc; outline: none;">
+                        <select id="zoneFilterSelect" style="flex: 1; min-width: 150px; padding: 12px; border-radius: 10px; border: 1px solid #ccc; outline: none;">
+                            <option value="all">All Zones</option>
+                            <option value="quiet">Quiet Zone 🤫</option>
+                            <option value="group">Group Study 👥</option>
+                            <option value="pc">PC Workstations 💻</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="seats-section">
+                    <h2>Library Floor Map (<span id="loadPercentage">0%</span> Full)</h2>
+                    <div id="seatContainer" class="seat-container">Loading seats...</div>
+                </section>
+            </section>
+
+            <!-- ANALYTICS VIEW -->
+            <section id="analyticsView" class="hidden">
+                <section class="dashboard">
+                    <div class="card"><h2 id="peakHourText">14:00</h2><p>Peak Occupancy Hour</p></div>
+                    <div class="card"><h2 id="avgDurationText">1.8 hrs</h2><p>Avg Session Time</p></div>
+                    <div class="card"><h2 id="turnoverText">0</h2><p>Daily Seat Turnovers</p></div>
+                </section>
+
+                <section class="seats-section">
+                    <h2>📈 Library Traffic & Seat Analytics</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <div style="background: white; padding: 15px; border-radius: 12px; border: 1px solid #eee;">
+                            <h3 style="margin-bottom: 10px; color: #333; text-align: center;">Hourly Occupancy Density</h3>
+                            <canvas id="occupancyChart"></canvas>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 12px; border: 1px solid #eee;">
+                            <h3 style="margin-bottom: 10px; color: #333; text-align: center;">Zone Distribution</h3>
+                            <canvas id="zoneChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- STAFF VIEW -->
+            <section id="staffView" class="hidden">
+                <section class="dashboard">
+                    <div class="card"><h2 id="staffAvailableCount">0</h2><p>Available Seats</p></div>
+                    <div class="card"><h2 id="staffOverdueCount">0</h2><p>Overdue Students</p></div>
+                    <div class="card"><h2 id="staffTotalCount">0</h2><p>Total Seats</p></div>
+                </section>
+
+                <section class="seats-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <h2 style="margin-bottom: 0;">Students Who Stepped Out</h2>
+                        <input type="text" id="staffSearchInput" placeholder="🔍 Search Reg No or Seat..." style="padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; outline: none;">
+                    </div>
+                    <table class="staff-table" id="departuresTable">
+                        <thead>
+                            <tr>
+                                <th>Seat</th>
+                                <th>Reg Number</th>
+                                <th>Return Time</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="departuresBody"></tbody>
+                    </table>
+                    <p id="noDepartures" class="hidden" style="text-align: center; padding: 20px; color: #666;">No students are currently away.</p>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <div id="sitDownModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <h3 id="sitDownTitle">Sit at Seat A01?</h3>
+            <form id="sitDownForm">
+                <label for="sitDownRegInput">Registration Number</label>
+                <input type="text" id="sitDownRegInput" placeholder="e.g. 21CS045" required>
+                <div class="modal-actions">
+                    <button type="button" id="cancelSitDownBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" id="confirmSitDownBtn" class="btn-primary">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="leaveChoiceModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <h3 id="leaveChoiceTitle">Leaving Seat A01?</h3>
+            <p class="modal-subtext">What would you like to do?</p>
+            <div class="modal-actions modal-actions-stacked">
+                <button type="button" id="takingBreakBtn" class="btn-primary">🚶 Taking a Break</button>
+                <button type="button" id="doneTodayBtn" class="btn-secondary">✅ Done for Today</button>
+                <button type="button" id="cancelLeaveChoiceBtn" class="btn-secondary" style="background: transparent; border: 1px solid #ccc;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="departureModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <h3>Expected Return Time</h3>
+            <form id="departureForm">
+                <label for="returnTimeInput">When will you be back?</label>
+                <input type="time" id="returnTimeInput" required>
+                <div class="modal-actions">
+                    <button type="button" id="cancelDepartureBtn" class="btn-secondary">Back</button>
+                    <button type="submit" id="confirmDepartureBtn" class="btn-primary">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
